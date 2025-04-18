@@ -1,3 +1,10 @@
+module FuncoesAvancadas (
+        listarPorCategoria,
+        listarPorPrioridade,
+        ordenarPorPrioridade,
+        filtrarPorStatus,
+        buscarPorPalavraChave
+)where
 import Tipos
 
 listarPorCategoria :: Categoria -> [Tarefa] -> [Tarefa]
@@ -20,3 +27,9 @@ filtrarPorStatus _ [] = []
 filtrarPorStatus s (x:xs)
     |status x == s = x : filtrarPorStatus s xs
     |otherwise = filtrarPorStatus s xs
+
+buscarPorPalavraChave :: String -> [Tarefa] -> [Tarefa]
+buscarPorPalavraChave _ [] = []
+buscarPorPalavraChave p (x:xs)
+    |elem p (tags x) = x : buscarPorPalavraChave p xs
+    |otherwise = buscarPorPalavraChave p xs
