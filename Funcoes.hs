@@ -56,3 +56,40 @@ filtrarPorStatus s l = recursaoGenerica (\t -> status t == s) l
 
 buscarPorPalavraChave :: String -> [Tarefa] -> [Tarefa]
 buscarPorPalavraChave p l = recursaoGenerica (\t -> elem p (tags t)) l
+
+-- Formatação do percentual com uma casa decimal
+formatacao :: Float -> String
+formatacao valor = 
+    let arredonda = (fromIntegral (round (valor * 10)) / 10) :: Float
+        str = show arredonda
+    in if last str == '0' 
+       then init str
+       else str
+
+criarRelatorio :: [Tarefa] -> IO ()
+criarRelatorio tarefas = do
+    -- Cálculo dos totais
+    let totalTarefas = length tarefas
+    let tarefasPendentes = length $ filter (\t -> status t == Pendente) tarefas
+    let tarefasConcluidas = length $ filter (\t -> status t == Concluida) tarefas
+    
+    -- Cálculo da distribuição por categorias
+    let categoriasUnicas = [Trabalho, Estudos, Pessoal, Outro]
+    let contarCategoria cat = length $ filter (\t -> categoria t == cat) tarefas
+    let distribuicaoCategoria = [(cat, contarCategoria cat) | cat <- categoriasUnicas]
+    
+    -- Exibição do relatório
+    putStrLn "\nRelatório Resumido:"
+    putStrLn $ "- Total de tarefas: " ++ show totalTarefas
+    putStrLn $ "- Pendentes: " ++ show tarefasPendentes ++ " | Concluídas: " ++ show tarefasConcluidas
+    putStrLn "- Distribuição por categoria:"
+    
+    -- Exibição das categorias com contagem e percentual
+    mapM_ (\(cat, quantidade) -> do
+        let percentual = if totalTarefas > 0 
+                         then (fromIntegral quantidade / fromIntegral totalTarefas) * 100
+                         else 0.0
+        let pluralSuffix = if quantidade == 1 then "tarefa" else "tarefas"
+        putStrLn $ "  * " ++ show cat ++ ": " ++ show quantidade ++ " " ++ pluralSuffix ++ 
+                   " (" ++ formatacao percentual ++ "%)"
+    ) distribuicaoCategoria
