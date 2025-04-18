@@ -1,7 +1,11 @@
-import Tipos
 --como no pdf diz que o identificador e unico, nao vou me preocupar em ter
 --dois IDs iguais
-
+module FuncoesBasicas (
+        adicionarTarefa,
+        removerTarefa,
+        marcarConcluida
+)where
+import Tipos
 adicionarTarefa :: Tarefa -> [Tarefa] -> [Tarefa]
 adicionarTarefa tarefa listaTarefas = tarefa : listaTarefas
 
