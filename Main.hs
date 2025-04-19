@@ -1,7 +1,6 @@
 module Main (main) where
 import Tipos
-import FuncoesBasicas
-import FuncoesAvancadas
+import Funcoes
 import Persistencia
 import System.IO (hFlush, stdout)
 import Data.Time (getCurrentTime, utctDay)
