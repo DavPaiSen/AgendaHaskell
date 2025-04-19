@@ -57,6 +57,32 @@ filtrarPorStatus s l = recursaoGenerica (\t -> status t == s) l
 buscarPorPalavraChave :: String -> [Tarefa] -> [Tarefa]
 buscarPorPalavraChave p l = recursaoGenerica (\t -> elem p (tags t)) l
 
+-- gestao de prazos
+
+verificarAtrasos :: [Tarefa] -> Day -> [Tarefa] --retorna as tarefas com prazo < data atual
+verificarAtrasos tarefas hoje =
+    filter(\t -> case prazo t of
+                  Just d -> d < hoje && status t == Pendente
+                  Nothing -> False) tarefas
+
+
+calcularDiasRestantes :: Tarefa -> Day -> Maybe Int 
+calcularDiasRestantes t hoje =
+    case prazo t of
+        Just d -> Just (fromIntegral (diffDays d hoje))
+        Nothing -> Nothing
+
+--tags
+
+filtrarPorTag :: String -> [Tarefa] -> [Tarefa]  
+filtrarPorTag p tarefas = recursaoGenerica (\t -> elem p (tags t)) tarefas
+
+nuvemDeTags :: [Tarefa] -> [(String, Int)]
+nuvemDeTags tarefas =
+    let todasTags = concatMap tags tarefas
+        mapa = foldr (\tag acc -> Map.insertWith (+) tag 1 acc) Map.empty todasTags
+    in Map.toList mapa
+
 -- Formatação do percentual com uma casa decimal
 formatacao :: Float -> String
 formatacao valor = 
