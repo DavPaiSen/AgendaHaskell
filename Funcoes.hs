@@ -12,6 +12,8 @@ module Funcoes (
 )where
 import Tipos
 import Exemplos
+import qualified Data.Map as Map
+import Data.Time.Calendar(Day, diffDays)
 --funcoes basicas
 adicionarTarefa :: Tarefa -> [Tarefa] -> [Tarefa]
 adicionarTarefa tarefa listaTarefas = tarefa : listaTarefas
