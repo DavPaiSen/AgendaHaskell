@@ -121,3 +121,10 @@ criarRelatorio tarefas = do
         putStrLn $ "  * " ++ show cat ++ ": " ++ show quantidade ++ " " ++ pluralSuffix ++ 
                    " (" ++ formatacao percentual ++ "%)"
     ) distribuicaoCategoria
+
+proximoId :: [Tarefa] -> Int
+proximoId tarefas =
+    if null tarefas
+        then 1
+        else maximum (map idTarefa tarefas) + 1
+
