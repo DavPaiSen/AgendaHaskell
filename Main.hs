@@ -4,22 +4,27 @@ import Funcoes
 import Persistencia
 import System.IO (hFlush, stdout)
 import Data.Time (getCurrentTime, utctDay)
+import System.IO.Error (tryIOError)
 
 main :: IO ()
 main = do
-    -- Opção 1: Começar com uma lista vazia
-    let tarefasIniciais = []
+    -- Tenta carregar tarefas do arquivo com tratamento de erro
+    tentativa <- tryIOError (carregarDeArquivo "tarefas.txt")
+    tarefasIniciais <- case tentativa of
+        Left _ -> do
+            putStrLn "Arquivo 'tarefas.txt' não encontrado. Iniciando com lista vazia."
+            return []
+        Right t -> return t
+    
     putStrLn "Bem-vindo ao Gerenciador de Tarefas!"
-    putStrLn "Começando com uma lista vazia de tarefas."
-    
-    -- Opção 2: Carregar um arquivo padrão no início
-    -- tarefasIniciais <- carregarDeArquivo "tarefas.txt"
-    -- putStrLn "Bem-vindo ao Gerenciador de Tarefas!"
-    -- putStrLn "Tarefas carregadas do arquivo padrão."
-    
+    if null tarefasIniciais
+        then putStrLn "Nenhuma tarefa encontrada."
+        else putStrLn $ "Tarefas carregadas: " ++ show (length tarefasIniciais) ++ " encontradas."
+
+    -- Inicia o loop principal
     mainLoop tarefasIniciais
 
--- Menu de opções com todas as funcionalidades solicitadas
+-- Exibe o menu de opções
 menu :: IO ()
 menu = do
     putStrLn "\nMenu de Tarefas"
@@ -66,10 +71,14 @@ mainLoop tarefas = do
             mainLoop tarefas
             
         "3" -> do
-            novaTarefa <- lerTarefa (length tarefas + 1)
-            let novasTarefas = adicionarTarefa novaTarefa tarefas
-            putStrLn "Tarefa adicionada com sucesso!"
-            mainLoop novasTarefas
+            let novaTarefa = criarTarefa (proximoId tarefas)
+            case adicionarTarefa novaTarefa tarefas of
+                Left msg -> do
+                    putStrLn msg
+                    mainLoop tarefas
+                Right novas -> do
+                    putStrLn "Tarefa adicionada com sucesso!"
+                    mainLoop novas
             
         "4" -> do
             putStr "Digite o ID da tarefa a ser removida: "
@@ -151,19 +160,20 @@ mainLoop tarefas = do
             mainLoop tarefas
             
         "13" -> do
-            putStr "Digite o ID da tarefa: "
+            putStr "Digite o ID da tarefa para calcular dias restantes: "
             hFlush stdout
             idStr <- getLine
             let id = read idStr :: Int
-            dataAtual <- getCurrentTime
-            let hoje = utctDay dataAtual
+            dataAtual <- utctDay <$> getCurrentTime
             case encontrarTarefa id tarefas of
                 Nothing -> putStrLn "Tarefa não encontrada!"
-                Just t -> case calcularDiasRestantes t hoje of
-                    Nothing -> putStrLn "Esta tarefa não tem prazo definido."
-                    Just dias -> if dias < 0
-                                then putStrLn $ "Tarefa atrasada em " ++ show (abs dias) ++ " dias."
-                                else putStrLn $ "Faltam " ++ show dias ++ " dias para o prazo."
+                Just t -> case calcularDiasRestantes t dataAtual of
+                    Nothing -> putStrLn "Tarefa sem prazo definido"
+                    Just dias ->
+                        putStrLn $
+                            if dias < 0
+                                then "Atrasada em " ++ show (abs dias) ++ " dias"
+                                else "Faltam " ++ show dias ++ " dias"
             mainLoop tarefas
             
         "14" -> do
