@@ -19,7 +19,6 @@ module Funcoes (
     lerPrioridade,
     lerStatus,
     listarTarefas,
-    lerStatus,
     lerEntradaValidada,
     splitOnChar
 ) where
@@ -28,7 +27,7 @@ import Exemplos
 import qualified Data.Map as Map
 import Data.Time.Calendar(Day, diffDays)
 import Data.Char(toLower)
-import System.IO (hFlush, stdout)
+import System.IO (hFlush,stdout)
 
 splitOnChar :: Char -> String -> [String]
 splitOnChar _ [] = [""]
