@@ -1,20 +1,32 @@
 --como no pdf diz que o identificador e unico, nao vou me preocupar em ter
 --dois IDs iguais
 module Funcoes (
-        adicionarTarefa,
-        removerTarefa,
-        marcarConcluida,
-        listarPorCategoria,
-        listarPorPrioridade,
-        ordenarPorPrioridade,
-        filtrarPorStatus,
-        buscarPorPalavraChave
-)where
+    adicionarTarefa,
+    removerTarefa,
+    marcarConcluida,
+    listarPorCategoria,
+    listarPorPrioridade,
+    ordenarPorPrioridade,
+    filtrarPorStatus,
+    buscarPorPalavraChave,
+    verificarAtrasos,
+    calcularDiasRestantes,
+    filtrarPorTag,
+    nuvemDeTags,
+    criarRelatorio,
+    proximoId,
+    lerCategoria,
+    lerPrioridade,
+    lerStatus,
+    listarTarefas,
+    lerStatus,
+) where
 import Tipos
 import Exemplos
 import qualified Data.Map as Map
 import Data.Time.Calendar(Day, diffDays)
 import Data.Char(toLower)
+
 --funcoes basicas
 adicionarTarefa :: Tarefa -> [Tarefa] -> [Tarefa]
 adicionarTarefa tarefa listaTarefas = tarefa : listaTarefas
@@ -36,6 +48,16 @@ marcarConcluida n (x:xs)
         case marcarConcluida n xs of
             Left False -> Left False
             Right l -> Right (x : l)
+lerStatus :: String -> Maybe Status
+lerStatus s = case map toLower s of
+     "pendente"  -> Just Pendente
+     "concluida" -> Just Concluida
+     _           -> Nothing
+listarTarefas :: [Tarefa] -> IO ()
+listarTarefas tarefas =
+    mapM_ (\t -> putStrLn $ "- [" ++ show (idTarefa t) ++ "] " ++ descricao t ++ " (" ++ show (status t) ++ ")") tarefas
+
+
 
 --funcoes avancadas
 
