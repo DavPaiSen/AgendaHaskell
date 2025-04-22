@@ -19,7 +19,7 @@ criarTarefa tarefas = do
 
     putStr "Tags (separadas por vírgula): "
     hFlush stdout
-    tags <- fmap (splitOn ",") getLine
+    tags <- fmap (splitOnChar ",") getLine
 
     let novoId = proximoId tarefas
 
