@@ -1,6 +1,5 @@
 --como no pdf diz que o identificador e unico, nao vou me preocupar em ter
 --dois IDs iguais
-import System.IO (hFlush,stdout)
 module Funcoes (
     adicionarTarefa,
     removerTarefa,
@@ -21,6 +20,7 @@ module Funcoes (
     lerStatus,
     listarTarefas,
     lerStatus,
+    lerEntradaValidada,
     splitOnChar
 ) where
 import Tipos
@@ -28,6 +28,7 @@ import Exemplos
 import qualified Data.Map as Map
 import Data.Time.Calendar(Day, diffDays)
 import Data.Char(toLower)
+import System.IO (hFlush, stdout)
 
 splitOnChar :: Char -> String -> [String]
 splitOnChar _ [] = [""]
