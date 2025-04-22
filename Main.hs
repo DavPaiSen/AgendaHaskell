@@ -5,6 +5,32 @@ import Persistencia
 import System.IO (hFlush, stdout)
 import Data.Time (getCurrentTime, utctDay)
 import System.IO.Error (tryIOError)
+import Data.Char (toLower)
+import Data.List.Split (splitOn)
+
+criarTarefa :: [Tarefa] -> IO Tarefa
+criarTarefa tarefas = do
+    putStr "Descrição: "
+    hFlush stdout
+    descricao <- getLine
+
+    categoria <- lerEntradaValidada "Categoria: " lerCategoria
+    prioridade <- lerEntradaValidada "Prioridade: " lerPrioridade
+
+    putStr "Tags (separadas por vírgula): "
+    hFlush stdout
+    tags <- fmap (splitOn ",") getLine
+
+    let novoId = proximoId tarefas
+
+    return Tarefa {
+        idTarefa = novoId,
+        descricao = descricao,
+        status = Pendente,
+        prioridade = prioridade,
+        categoria = categoria,
+        tags = tags,
+    }
 
 main :: IO ()
 main = do
@@ -17,9 +43,9 @@ main = do
         Right t -> return t
     
     putStrLn "Bem-vindo ao Gerenciador de Tarefas!"
-    if null tarefasIniciais
-        then putStrLn "Nenhuma tarefa encontrada."
-        else putStrLn $ "Tarefas carregadas: " ++ show (length tarefasIniciais) ++ " encontradas."
+    case tarefasIniciais of
+        [] -> putStrLn "Nenhuma tarefa encontrada."
+        ts -> putStrLn $ "Tarefas carregadas: " ++ show (length ts) ++ " encontradas."
 
     -- Inicia o loop principal
     mainLoop tarefasIniciais
@@ -48,11 +74,12 @@ menu = do
     putStr "Escolha uma opção: "
     hFlush stdout -- força a exibição imediata, evitando o buffer
 
--- Loop principal incluindo todas as funcionalidades
+-- Loop principal
 mainLoop :: [Tarefa] -> IO ()
 mainLoop tarefas = do
     menu
     opcao <- getLine
+
     case opcao of
         "1" -> do
             putStr "Digite o nome do arquivo para carregar: "
@@ -61,7 +88,7 @@ mainLoop tarefas = do
             novasTarefas <- carregarDeArquivo arquivo
             putStrLn $ "Tarefas carregadas de " ++ arquivo
             mainLoop novasTarefas
-            
+
         "2" -> do
             putStr "Digite o nome do arquivo para salvar: "
             hFlush stdout
@@ -69,9 +96,9 @@ mainLoop tarefas = do
             salvarEmArquivo arquivo tarefas
             putStrLn $ "Tarefas salvas em " ++ arquivo
             mainLoop tarefas
-            
+
         "3" -> do
-            let novaTarefa = criarTarefa (proximoId tarefas)
+            novaTarefa <- criarTarefa tarefas
             case adicionarTarefa novaTarefa tarefas of
                 Left msg -> do
                     putStrLn msg
@@ -79,7 +106,7 @@ mainLoop tarefas = do
                 Right novas -> do
                     putStrLn "Tarefa adicionada com sucesso!"
                     mainLoop novas
-            
+
         "4" -> do
             putStr "Digite o ID da tarefa a ser removida: "
             hFlush stdout
@@ -92,7 +119,7 @@ mainLoop tarefas = do
                 Right novasTarefas -> do
                     putStrLn "Tarefa removida com sucesso!"
                     mainLoop novasTarefas
-            
+
         "5" -> do
             putStr "Digite o ID da tarefa a marcar como concluída: "
             hFlush stdout
@@ -105,97 +132,78 @@ mainLoop tarefas = do
                 Right novasTarefas -> do
                     putStrLn "Tarefa marcada como concluída!"
                     mainLoop novasTarefas
-            
+
         "6" -> do
             listarTarefas tarefas
             mainLoop tarefas
-            
+
         "7" -> do
-            putStr "Digite a categoria (Trabalho/Estudos/Pessoal/Outro): "
-            hFlush stdout
-            categoriaStr <- getLine
-            let categoria = lerCategoria categoriaStr
+            categoria <- lerEntradaValidada "Digite a categoria (Trabalho/Estudos/Pessoal/Outro): " lerCategoria
             let tarefasFiltradas = listarPorCategoria categoria tarefas
             listarTarefas tarefasFiltradas
             mainLoop tarefas
-            
+
         "8" -> do
-            putStr "Digite a prioridade (Alta/Media/Baixa): "
-            hFlush stdout
-            prioridadeStr <- getLine
-            let prioridade = lerPrioridade prioridadeStr
+            prioridade <- lerEntradaValidada "Digite a prioridade (Alta/Media/Baixa): " lerPrioridade
             let tarefasFiltradas = listarPorPrioridade prioridade tarefas
             listarTarefas tarefasFiltradas
             mainLoop tarefas
-            
+
         "9" -> do
-            let tarefasOrdenadas = ordenarPorPrioridade tarefas
-            putStrLn "Tarefas ordenadas por prioridade (Alta -> Baixa):"
-            listarTarefas tarefasOrdenadas
+            let ordenadas = ordenarPorPrioridade tarefas
+            listarTarefas ordenadas
             mainLoop tarefas
-            
+
         "10" -> do
-            putStr "Digite o status (Pendente/Concluida): "
-            hFlush stdout
-            statusStr <- getLine
-            let status = lerStatus statusStr
+            status <- lerEntradaValidada "Digite o status (Pendente/Concluida): " lerStatus
             let tarefasFiltradas = filtrarPorStatus status tarefas
             listarTarefas tarefasFiltradas
             mainLoop tarefas
-            
+
         "11" -> do
-            putStr "Digite a palavra-chave para buscar: "
+            putStr "Digite a palavra-chave: "
             hFlush stdout
-            keyword <- getLine
-            let tarefasEncontradas = buscarPorPalavraChave keyword tarefas
-            listarTarefas tarefasEncontradas
+            palavra <- getLine
+            let resultados = buscarPorPalavraChave palavra tarefas
+            listarTarefas resultados
             mainLoop tarefas
-            
+
         "12" -> do
-            dataAtual <- getCurrentTime
-            let hoje = utctDay dataAtual
-            let tarefasAtrasadas = verificarAtrasos tarefas hoje
-            putStrLn "Tarefas atrasadas:"
-            listarTarefas tarefasAtrasadas
-            mainLoop tarefas
-            
-        "13" -> do
-            putStr "Digite o ID da tarefa para calcular dias restantes: "
-            hFlush stdout
-            idStr <- getLine
-            let id = read idStr :: Int
             dataAtual <- utctDay <$> getCurrentTime
-            case encontrarTarefa id tarefas of
-                Nothing -> putStrLn "Tarefa não encontrada!"
-                Just t -> case calcularDiasRestantes t dataAtual of
-                    Nothing -> putStrLn "Tarefa sem prazo definido"
-                    Just dias ->
-                        putStrLn $
-                            if dias < 0
-                                then "Atrasada em " ++ show (abs dias) ++ " dias"
-                                else "Faltam " ++ show dias ++ " dias"
+            let atrasadas = verificarAtrasos tarefas dataAtual
+            putStrLn "Tarefas atrasadas:"
+            listarTarefas atrasadas
             mainLoop tarefas
-            
+
+        "13" -> do
+            dataAtual <- utctDay <$> getCurrentTime
+            let resultados = map (\t -> (t, calcularDiasRestantes t dataAtual)) tarefas
+            mapM_ (\(t, dias) -> case dias of
+                Just d -> putStrLn $ "Tarefa " ++ show (idTarefa t) ++ ": " ++ show d ++ " dias restantes."
+                Nothing -> putStrLn $ "Tarefa " ++ show (idTarefa t) ++ ": Sem prazo definido."
+            ) resultados
+            mainLoop tarefas
+
         "14" -> do
-            putStr "Digite a tag para filtrar: "
+            putStr "Digite a tag: "
             hFlush stdout
             tag <- getLine
             let tarefasFiltradas = filtrarPorTag tag tarefas
             listarTarefas tarefasFiltradas
             mainLoop tarefas
-            
+
         "15" -> do
             let nuvem = nuvemDeTags tarefas
-            putStrLn "Nuvem de Tags (tag: ocorrências):"
-            mapM_ (\(tag, count) -> putStrLn $ "  " ++ tag ++ ": " ++ show count) nuvem
+            putStrLn "Nuvem de Tags:"
+            mapM_ (\(tag, count) -> putStrLn $ "  - " ++ tag ++ ": " ++ show count ++ " ocorrências") nuvem
             mainLoop tarefas
-            
+
         "16" -> do
             criarRelatorio tarefas
             mainLoop tarefas
-            
+
         "17" -> putStrLn "Até logo! :)"
-        
+
         _   -> do
             putStrLn "Opção inválida! Tente novamente."
             mainLoop tarefas
