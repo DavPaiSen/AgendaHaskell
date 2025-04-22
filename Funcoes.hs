@@ -175,3 +175,13 @@ lerPrioridade s = case map toLower s of
     "media"  -> Just Media
     "baixa"  -> Just Baixa
     _        -> Nothing
+
+
+lerEntradaValidada :: String -> (String -> Maybe a) -> IO a
+lerEntradaValidada prompt parser = do
+    putStr prompt
+    hFlush stdout
+    entrada <- getLine
+    maybe (putStrLn "Entrada inválida! Tente novamente." >> lerEntradaValidada prompt parser) 
+          return 
+          (parser entrada)
