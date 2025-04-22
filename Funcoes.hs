@@ -128,3 +128,18 @@ proximoId tarefas =
         then 1
         else maximum (map idTarefa tarefas) + 1
 
+-- Funções para converter String em tipos
+lerCategoria :: String -> Maybe Categoria
+lerCategoria s = case map toLower s of
+    "trabalho" -> Just Trabalho
+    "estudos"  -> Just Estudos
+    "pessoal"  -> Just Pessoal
+    "outro"    -> Just Outro
+    _          -> Nothing
+
+lerPrioridade :: String -> Maybe Prioridade
+lerPrioridade s = case map toLower s of
+    "alta"   -> Just Alta
+    "media"  -> Just Media
+    "baixa"  -> Just Baixa
+    _        -> Nothing
