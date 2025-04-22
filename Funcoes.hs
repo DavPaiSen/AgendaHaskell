@@ -96,32 +96,27 @@ formatacao valor =
 
 criarRelatorio :: [Tarefa] -> IO ()
 criarRelatorio tarefas = do
-    -- Cálculo dos totais
     let totalTarefas = length tarefas
-    let tarefasPendentes = length $ filter (\t -> status t == Pendente) tarefas
-    let tarefasConcluidas = length $ filter (\t -> status t == Concluida) tarefas
-    
-    -- Cálculo da distribuição por categorias
-    let categoriasUnicas = [Trabalho, Estudos, Pessoal, Outro]
-    let contarCategoria cat = length $ filter (\t -> categoria t == cat) tarefas
-    let distribuicaoCategoria = [(cat, contarCategoria cat) | cat <- categoriasUnicas]
-    
-    -- Exibição do relatório
+        tarefasPendentes = length $ filter (\t -> status t == Pendente) tarefas
+        tarefasConcluidas = length $ filter (\t -> status t == Concluida) tarefas
+        categoriasUnicas = [Trabalho, Estudos, Pessoal, Outro]
+        contarCategoria cat = length $ filter (\t -> categoria t == cat) tarefas
+        distribuicaoCategoria = [(cat, contarCategoria cat) | cat <- categoriasUnicas]
+
     putStrLn "\nRelatório Resumido:"
     putStrLn $ "- Total de tarefas: " ++ show totalTarefas
     putStrLn $ "- Pendentes: " ++ show tarefasPendentes ++ " | Concluídas: " ++ show tarefasConcluidas
     putStrLn "- Distribuição por categoria:"
     
-    -- Exibição das categorias com contagem e percentual
     mapM_ (\(cat, quantidade) -> do
         let percentual = if totalTarefas > 0 
                          then (fromIntegral quantidade / fromIntegral totalTarefas) * 100
                          else 0.0
-        let pluralSuffix = if quantidade == 1 then "tarefa" else "tarefas"
+            pluralSuffix = if quantidade == 1 then "tarefa" else "tarefas"
         putStrLn $ "  * " ++ show cat ++ ": " ++ show quantidade ++ " " ++ pluralSuffix ++ 
                    " (" ++ formatacao percentual ++ "%)"
     ) distribuicaoCategoria
-
+    
 proximoId :: [Tarefa] -> Int
 proximoId tarefas =
     if null tarefas
