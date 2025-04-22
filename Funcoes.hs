@@ -20,12 +20,21 @@ module Funcoes (
     lerStatus,
     listarTarefas,
     lerStatus,
+    splitOnChar
 ) where
 import Tipos
 import Exemplos
 import qualified Data.Map as Map
 import Data.Time.Calendar(Day, diffDays)
 import Data.Char(toLower)
+
+splitOnChar :: Char -> String -> [String]
+splitOnChar _ [] = [""]
+splitOnChar delim (x:xs)
+    | x == delim = "" : rest
+    | otherwise  = (x : head rest) : tail rest
+    where
+        rest = splitOnChar delim xs
 
 --funcoes basicas
 adicionarTarefa :: Tarefa -> [Tarefa] -> [Tarefa]
