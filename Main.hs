@@ -6,7 +6,6 @@ import System.IO (hFlush, stdout)
 import Data.Time (getCurrentTime, utctDay)
 import System.IO.Error (tryIOError)
 import Data.Char (toLower)
-import Data.List.Split (splitOn)
 
 criarTarefa :: [Tarefa] -> IO Tarefa
 criarTarefa tarefas = do
@@ -19,7 +18,7 @@ criarTarefa tarefas = do
 
     putStr "Tags (separadas por vírgula): "
     hFlush stdout
-    tags <- fmap (splitOnChar ",") getLine
+    tags <- fmap (splitOnChar ',') getLine
 
     let novoId = proximoId tarefas
 
@@ -100,13 +99,10 @@ mainLoop tarefas = do
 
         "3" -> do
             novaTarefa <- criarTarefa tarefas
-            case adicionarTarefa novaTarefa tarefas of
-                Left msg -> do
-                    putStrLn msg
-                    mainLoop tarefas
-                Right novas -> do
-                    putStrLn "Tarefa adicionada com sucesso!"
-                    mainLoop novas
+            let novas = adicionarTarefa novaTarefa tarefas
+            putStrLn "Tarefa adicionada com sucesso!"
+            mainLoop novas
+            --adicionar tratamento de erro de ID duplo em funcoes.hs
 
         "4" -> do
             putStr "Digite o ID da tarefa a ser removida: "
@@ -182,7 +178,7 @@ mainLoop tarefas = do
             mapM_ (\(t, dias) -> case dias of
                 Just d -> putStrLn $ "Tarefa " ++ show (idTarefa t) ++ ": " ++ show d ++ " dias restantes."
                 Nothing -> putStrLn $ "Tarefa " ++ show (idTarefa t) ++ ": Sem prazo definido."
-            ) resultados
+                  ) resultados
             mainLoop tarefas
 
         "14" -> do
