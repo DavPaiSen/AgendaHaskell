@@ -1,5 +1,6 @@
 --como no pdf diz que o identificador e unico, nao vou me preocupar em ter
 --dois IDs iguais
+import System.IO (hFlush,stdout)
 module Funcoes (
     adicionarTarefa,
     removerTarefa,
