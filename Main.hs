@@ -30,6 +30,7 @@ criarTarefa tarefas = do
         prioridade = prioridade,
         categoria = categoria,
         tags = tags,
+        prazo = Nothing
     }
 
 main :: IO ()
