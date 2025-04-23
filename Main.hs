@@ -20,8 +20,8 @@ criarTarefa tarefas = do
     hFlush stdout
     descricao <- getLine
 
-    categoria <- lerEntradaValidada "Categoria: " lerCategoria
-    prioridade <- lerEntradaValidada "Prioridade: " lerPrioridade
+    categoria <- lerEntradaValidada "Categoria(Trabalho, Estudos,Pessoal, Outro): " lerCategoria
+    prioridade <- lerEntradaValidada "Prioridade(Baixa, Media, Alta): " lerPrioridade
 
     putStr "Tags (separadas por vírgula): "
     hFlush stdout
