@@ -9,6 +9,7 @@ module Main (main) where
 import Tipos
 import Funcoes
 import Persistencia
+import Testes
 import System.IO (hFlush, stdout)
 import Data.Time (getCurrentTime, utctDay)
 import System.IO.Error (tryIOError)
@@ -20,8 +21,8 @@ criarTarefa tarefas = do
     hFlush stdout
     descricao <- getLine
 
-    categoria <- lerEntradaValidada "Categoria(Trabalho, Estudos,Pessoal, Outro): " lerCategoria
-    prioridade <- lerEntradaValidada "Prioridade(Baixa, Media, Alta): " lerPrioridade
+    categoria <- lerEntradaValidada "Categoria: " lerCategoria
+    prioridade <- lerEntradaValidada "Prioridade: " lerPrioridade
 
     putStr "Tags (separadas por vírgula): "
     hFlush stdout
@@ -77,7 +78,8 @@ menu = do
     putStrLn "14. Filtrar por tag"
     putStrLn "15. Gerar nuvem de tags"
     putStrLn "16. Criar relatório"
-    putStrLn "17. Sair"
+    putStrLn "17. Executar testes"
+    putStrLn "18. Sair"
     putStr "Escolha uma opção: "
     hFlush stdout -- força a exibição imediata, evitando o buffer
 
@@ -205,8 +207,13 @@ mainLoop tarefas = do
         "16" -> do
             criarRelatorio tarefas
             mainLoop tarefas
+            
+        "17" -> do
+            putStrLn "Executando testes..."
+            Testes.executarTestes
+            mainLoop tarefas
 
-        "17" -> putStrLn "Até logo! :)"
+        "18" -> putStrLn "Até logo! :)"
 
         _   -> do
             putStrLn "Opção inválida! Tente novamente."
