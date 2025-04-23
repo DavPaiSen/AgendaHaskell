@@ -23,7 +23,6 @@ module Funcoes (
     splitOnChar
 ) where
 import Tipos
-import Exemplos
 import qualified Data.Map as Map
 import Data.Time.Calendar(Day, diffDays)
 import Data.Char(toLower)
