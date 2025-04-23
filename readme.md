@@ -67,7 +67,8 @@ Ao iniciar o programa, será apresentado um menu com as seguintes opções:
 14. Filtrar por tag
 15. Gerar nuvem de tags
 16. Criar relatório
-17. Sair
+17. Executar testes
+18. Sair
 
 Para selecionar uma opção, basta digitar o número correspondente e pressionar Enter.
 
