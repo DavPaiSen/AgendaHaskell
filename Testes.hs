@@ -2,7 +2,7 @@ module Testes where
 
 import Tipos
 import Funcoes
-import Data.Time.Calendar (Day, fromGregorian) -- Especifica um prazo (prazo :: Maybe Day) de forma clara e tipada.
+import Data.Time.Calendar (Day, fromGregorian) -- Especifica um prazo de forma clara e tipada.
 
 -- Exemplos de tarefas
 tarefas :: [Tarefa]
