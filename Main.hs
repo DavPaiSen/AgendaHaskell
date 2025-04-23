@@ -1,3 +1,10 @@
+{-
+Integrantes do grupo:
+- Davi Paiva Sendin - 12421BCC004
+- Gabriel Fachini - 12411BCC092
+- Gabriel Henrique Carneiro Amorim - 12411BCC055
+-}
+
 module Main (main) where
 import Tipos
 import Funcoes
