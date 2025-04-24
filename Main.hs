@@ -78,7 +78,7 @@ menu = do
     putStrLn "14. Filtrar por tag"
     putStrLn "15. Gerar nuvem de tags"
     putStrLn "16. Criar relatório"
-    putStrLn "17. Executar testes"
+    putStrLn "17. Executar testes manuais"
     putStrLn "18. Sair"
     putStr "Escolha uma opção: "
     hFlush stdout -- força a exibição imediata, evitando o buffer
