@@ -15,6 +15,7 @@ O projeto está organizado em módulos:
 - **Tipos.hs**: Define os tipos algébricos (Status, Prioridade, Categoria e Tarefa).
 - **Funcoes.hs**: Implementa as funções básicas e avançadas.
 - **Persistencia.hs**: Implementa as funções para salvar e carregar tarefas de arquivos.
+- **Testes.hs**: Contém testes manuais.
 - **Main.hs**: Contém uma interface para o usuário via terminal.
 
 ## Requisitos
@@ -67,7 +68,7 @@ Ao iniciar o programa, será apresentado um menu com as seguintes opções:
 14. Filtrar por tag
 15. Gerar nuvem de tags
 16. Criar relatório
-17. Executar testes
+17. Executar testes manuais
 18. Sair
 
 Para selecionar uma opção, basta digitar o número correspondente e pressionar Enter.
