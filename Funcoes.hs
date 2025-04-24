@@ -20,11 +20,13 @@ module Funcoes (
     lerStatus,
     listarTarefas,
     lerEntradaValidada,
-    splitOnChar
+    splitOnChar,
+    lerPrazo
 ) where
 import Tipos
 import qualified Data.Map as Map
 import Data.Time.Calendar(Day, diffDays)
+import Data.Time (Day, parseTimeM, defaultTimeLocale)
 import Data.Char(toLower)
 import System.IO (hFlush,stdout)
 
@@ -185,3 +187,6 @@ lerEntradaValidada prompt parser = do
     maybe (putStrLn "Entrada inválida! Tente novamente." >> lerEntradaValidada prompt parser) 
           return 
           (parser entrada)
+          
+lerPrazo :: String -> Maybe Day
+lerPrazo d = parseTimeM True defaultTimeLocale "%Y-%m-%d" d
