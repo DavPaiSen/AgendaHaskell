@@ -94,9 +94,14 @@ mainLoop tarefas = do
             putStr "Digite o nome do arquivo para carregar: "
             hFlush stdout
             arquivo <- getLine
-            novasTarefas <- carregarDeArquivo arquivo
-            putStrLn $ "Tarefas carregadas de " ++ arquivo
-            mainLoop novasTarefas
+            novasTarefas <- tryIOError (carregarDeArquivo arquivo) 
+            case novasTarefas of
+                Left _ -> do
+                    putStrLn "Erro, o arquivo não foi encontrado!"
+                    mainLoop tarefas
+                Right novasTarefas -> do
+                    putStrLn $ "Tarefas carregadas de " ++ arquivo
+                    mainLoop novasTarefas
 
         "2" -> do
             putStr "Digite o nome do arquivo para salvar: "
