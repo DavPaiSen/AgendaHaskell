@@ -3,6 +3,8 @@ module Testes where
 import Tipos
 import Funcoes
 import Data.Time.Calendar (Day, fromGregorian) -- Especifica um prazo de forma clara e tipada.
+import Test.QuickCheck
+import Data.List (sortBy)
 
 -- Exemplos de tarefas
 tarefas :: [Tarefa]
@@ -18,7 +20,8 @@ tarefas =
   , Tarefa 5 "Consulta médica" Concluida Baixa Pessoal
       (Just (fromGregorian 2025 4 10)) ["saude"]
   ]
-  
+
+-- função que realiza os teste manuais
 executarTestes :: IO ()
 executarTestes = do
   putStrLn "\nIniciando testes...\n"
@@ -68,3 +71,58 @@ executarTestes = do
   criarRelatorio tarefas
 
   putStrLn "\nFim dos testes.\n"
+  
+-- Testes com QuickCheck
+
+-- Gera Prioridade aleatória
+instance Arbitrary Prioridade where
+  arbitrary = elements [Baixa, Media, Alta]
+
+-- Gera Categoria aleatória
+instance Arbitrary Categoria where
+  arbitrary = elements [Trabalho, Estudos, Pessoal, Outro]
+
+-- Gera Status aleatório
+instance Arbitrary Status where
+  arbitrary = elements [Pendente, Concluida]
+
+-- Gera Tarefas
+instance Arbitrary Tarefa where
+  arbitrary = do
+    id <- arbitrary
+    desc <- arbitrary
+    stat <- arbitrary
+    prio <- arbitrary
+    cat <- arbitrary
+    tags' <- listOf (elements ["tag1", "tag2", "tag3"])
+    return $ Tarefa id desc stat prio cat Nothing tags'
+
+-- Aumenta o tamanho da lista em 1
+propAdicionarTarefa :: Tarefa -> [Tarefa] -> Property
+propAdicionarTarefa t ts =
+  not (any (\x -> idTarefa x == idTarefa t) ts) ==>
+  length (adicionarTarefa t ts) === length ts + 1
+
+-- Adicionar e remover tarefas iguais não altera nada
+propRemoveAdiciona :: Tarefa -> [Tarefa] -> Property
+propRemoveAdiciona t ts =
+  not (any (\x -> idTarefa x == idTarefa t) ts) ==> -- ID único
+  let novaLista = adicionarTarefa t ts
+  in case removerTarefa (idTarefa t) novaLista of
+       Right lista -> lista === ts
+       Left _ -> property False
+
+-- Mantém a ordem decrescente
+propOrdenarPrioridade :: [Tarefa] -> Bool
+propOrdenarPrioridade ts =
+  let ordenadas = ordenarPorPrioridade ts
+      prioridades = map prioridade ordenadas
+  in prioridades == sortBy (flip compare) prioridades
+
+-- Todos os testes QuickCheck
+executarQuickCheck :: IO ()
+executarQuickCheck = do
+  putStrLn "\nTestes QuickCheck:"
+  quickCheck propAdicionarTarefa
+  quickCheck propRemoveAdiciona
+  quickCheck propOrdenarPrioridade
